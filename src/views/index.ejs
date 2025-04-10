@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Management Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-gray-50">
+    <div class="container mx-auto px-4 py-6">
+        <h1 class="text-2xl font-bold mb-6">PDF Management Dashboard</h1>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div class="bg-gray-100 rounded-lg shadow p-4 transition-transform duration-300 hover:translate-y-1">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h6 class="text-sm font-medium">Success</h6>
+                        <h2 class="text-2xl font-bold"><%= successCount %></h2>
+                    </div>
+                    <i class="fas fa-check-circle text-4xl text-gray-600"></i>
+                </div>
+            </div>
+            
+            <div class="bg-gray-100 rounded-lg shadow p-4 transition-transform duration-300 hover:translate-y-1">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h6 class="text-sm font-medium">Pending</h6>
+                        <h2 class="text-2xl font-bold"><%= pendingCount %></h2>
+                    </div>
+                    <i class="fas fa-clock text-4xl text-gray-600"></i>
+                </div>
+            </div>
+            
+            <div class="bg-gray-100 rounded-lg shadow p-4 transition-transform duration-300 hover:translate-y-1">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h6 class="text-sm font-medium">Failed</h6>
+                        <h2 class="text-2xl font-bold"><%= failedCount %></h2>
+                    </div>
+                    <i class="fas fa-times-circle text-4xl text-gray-600"></i>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Filter Section -->
+        <div class="bg-gray-100 rounded-lg p-4 mb-6">
+            <form id="filterForm" action="/dashboard" method="GET">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div>
+                        <label for="status" class="block text-sm font-medium mb-1">Status</label>
+                        <select class="w-full border border-gray-300 rounded px-3 py-2" id="status" name="status">
+                            <option value="" <%= !status ? 'selected' : '' %>>All</option>
+                            <option value="success" <%= status === 'success' ? 'selected' : '' %>>Success</option>
+                            <option value="pending" <%= status === 'pending' ? 'selected' : '' %>>Pending</option>
+                            <option value="failed" <%= status === 'failed' ? 'selected' : '' %>>Failed</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label for="dateFrom" class="block text-sm font-medium mb-1">Date From</label>
+                        <input type="date" class="w-full border border-gray-300 rounded px-3 py-2" id="dateFrom" name="dateFrom" value="<%= dateFrom %>">
+                    </div>
+                    
+                    <div>
+                        <label for="dateTo" class="block text-sm font-medium mb-1">Date To</label>
+                        <input type="date" class="w-full border border-gray-300 rounded px-3 py-2" id="dateTo" name="dateTo" value="<%= dateTo %>">
+                    </div>
+                    
+                    <div>
+                        <label for="keyword" class="block text-sm font-medium mb-1">Keyword</label>
+                        <input type="text" class="w-full border border-gray-300 rounded px-3 py-2" id="keyword" name="keyword" placeholder="Search..." value="<%= keyword %>">
+                    </div>
+                    
+                    <div class="md:col-span-4 flex justify-end mt-2">
+                        <button type="submit" class="bg-gray-700 text-white px-4 py-2 rounded mr-2">
+                            <i class="fas fa-filter mr-1"></i> Apply Filters
+                        </button>
+                        <button type="button" id="resetFilter" class="bg-gray-300 text-gray-800 px-4 py-2 rounded">
+                            <i class="fas fa-undo mr-1"></i> Reset
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Print Button & PDF Listing -->
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-xl font-medium">PDF Documents</h3>
+            <button id="printButton" class="bg-gray-700 text-white px-4 py-2 rounded">
+                <i class="fas fa-print mr-1"></i> Print List
+            </button>
+        </div>
+        
+        <div class="overflow-x-auto rounded-lg shadow" id="printableArea">
+            <table class="w-full">
+                <thead class="bg-gray-800 text-white">
+                    <tr>
+                        <th class="px-4 py-2 text-left">#</th>
+                        <th class="px-4 py-2 text-left">PDF Name</th>
+                        <th class="px-4 py-2 text-left">Date</th>
+                        <th class="px-4 py-2 text-left">Size</th>
+                        <th class="px-4 py-2 text-left">Status</th>
+                        <th class="px-4 py-2 text-left no-print">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% if (pdfList && pdfList.length > 0) { %>
+                        <% pdfList.forEach((pdf, index) => { %>
+                            <tr class="border-b hover:bg-gray-100">
+                                <td class="px-4 py-2"><%= index + 1 %></td>
+                                <td class="px-4 py-2"><%= pdf.name %></td>
+                                <td class="px-4 py-2"><%= new Date(pdf.date).toLocaleDateString() %></td>
+                                <td class="px-4 py-2"><%= pdf.size %></td>
+                                <td class="px-4 py-2">
+                                    <% if (pdf.status === 'success') { %>
+                                        <span class="bg-gray-200 text-gray-800 px-2 py-1 rounded-full text-xs">Success</span>
+                                    <% } else if (pdf.status === 'pending') { %>
+                                        <span class="bg-gray-200 text-gray-800 px-2 py-1 rounded-full text-xs">Pending</span>
+                                    <% } else { %>
+                                        <span class="bg-gray-200 text-gray-800 px-2 py-1 rounded-full text-xs">Failed</span>
+                                    <% } %>
+                                </td>
+                                <td class="px-4 py-2 no-print">
+                                    <button class="bg-gray-200 hover:bg-gray-300 px-2 py-1 rounded mr-1">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="bg-gray-200 hover:bg-gray-300 px-2 py-1 rounded mr-1">
+                                        <i class="fas fa-download"></i>
+                                    </button>
+                                    <button class="bg-gray-200 hover:bg-gray-300 px-2 py-1 rounded">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        <% }); %>
+                    <% } else { %>
+                        <tr>
+                            <td colspan="6" class="px-4 py-2 text-center">No PDF documents found</td>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Pagination -->
+        <div class="flex justify-between items-center mt-6">
+            <div class="text-sm text-gray-600">
+                Showing <%= pdfList.length %> of <%= totalPDFs %> documents
+            </div>
+            <div class="flex">
+                <% if (currentPage > 1) { %>
+                    <a href="?page=<%= currentPage - 1 %>&status=<%= status %>&dateFrom=<%= dateFrom %>&dateTo=<%= dateTo %>&keyword=<%= keyword %>" class="bg-gray-200 text-gray-800 px-3 py-1 rounded-l-lg">
+                        &laquo;
+                    </a>
+                <% } else { %>
+                    <span class="bg-gray-100 text-gray-400 px-3 py-1 rounded-l-lg">&laquo;</span>
+                <% } %>
+                
+                <% for(let i = 1; i <= totalPages; i++) { %>
+                    <a href="?page=<%= i %>&status=<%= status %>&dateFrom=<%= dateFrom %>&dateTo=<%= dateTo %>&keyword=<%= keyword %>" 
+                       class="<%= currentPage === i ? 'bg-gray-700 text-white' : 'bg-gray-200 text-gray-800' %> px-3 py-1">
+                        <%= i %>
+                    </a>
+                <% } %>
+                
+                <% if (currentPage < totalPages) { %>
+                    <a href="?page=<%= currentPage + 1 %>&status=<%= status %>&dateFrom=<%= dateFrom %>&dateTo=<%= dateTo %>&keyword=<%= keyword %>" class="bg-gray-200 text-gray-800 px-3 py-1 rounded-r-lg">
+                        &raquo;
+                    </a>
+                <% } else { %>
+                    <span class="bg-gray-100 text-gray-400 px-3 py-1 rounded-r-lg">&raquo;</span>
+                <% } %>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Print functionality
+        document.getElementById('printButton').addEventListener('click', function() {
+            window.print();
+        });
+        
+        // Reset filter form
+        document.getElementById('resetFilter').addEventListener('click', function() {
+            document.getElementById('status').value = '';
+            document.getElementById('dateFrom').value = '';
+            document.getElementById('dateTo').value = '';
+            document.getElementById('keyword').value = '';
+            document.getElementById('filterForm').submit();
+        });
+        
+        // Print stylesheet
+        const style = document.createElement('style');
+        style.innerHTML = `
+            @media print {
+                .no-print, .no-print * {
+                    display: none !important;
+                }
+                body {
+                    padding: 0;
+                    margin: 0;
+                }
+                button, form, .bg-gray-100 {
+                    display: none !important;
+                }
+                #printableArea {
+                    box-shadow: none;
+                }
+                table {
+                    width: 100%;
+                    border-collapse: collapse;
+                }
+                th, td {
+                    border: 1px solid #ddd;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
