@@ -8,19 +8,27 @@ datasource db {
 }
 
 model Order {
-  id         Int        @id
-  customer   Customer   @relation(fields: [customerId], references: [id])
-  customerId Int
-  lineItems  LineItem[]
-  createdAt  DateTime   @default(now())
+  id               Int        @id
+  customer         Customer   @relation(fields: [customerId], references: [id])
+  customerId       Int
+  lineItems        LineItem[]
+  node             String?
+  customAttributes Json
+  deliveryAddress  String?
+  deliveryDate     DateTime?
+  deliveryTime     String?
+  storeLocation    String?
+  deliveryMethod   String?
+  createdAt        DateTime   @default(now())
 }
 
 model Customer {
-  id         Int      @id @default(autoincrement())
-  email      String   @unique
-  firstName  String
-  lastName   String
-  orders     Order[]
+  id        Int     @id @default(autoincrement())
+  email     String  @unique
+  firstName String
+  lastName  String
+  phone     String
+  orders    Order[]
 }
 
 model LineItem {
