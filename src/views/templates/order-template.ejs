@@ -1,0 +1,415 @@
+<!-- order-template.ejs -->
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Order #<%= order.orderId %></title>
+    <style>
+    body {
+      font-family: 'Helvetica', sans-serif;
+      margin: 0;
+      padding: 0;
+      color: #334e68;
+      max-width: 1200px;
+      margin: 0 auto;
+      position: relative;
+      min-height: 1000px;
+      height: 100vh;
+    }
+    .header {
+      background-color: #f0f4f8;
+      padding: 30px 50px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .order-number {
+      font-size: 28px;
+      font-weight: bold;
+      color: #1a3a5f;
+      margin: 0 0 10px 0;
+    }
+    .category{
+      font-size: 16px;
+      color: #4a6584;
+      margin: 5px 0;
+    }
+    .timestamp {
+      font-size: 10px;
+      color: #627d98;
+      margin-top: 15px;
+    }
+    .info-boxes {
+      display: flex;
+      margin: 0 50px;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .customer-box, .delivery-box {
+      padding: 20px;
+      border-radius: 5px;
+      flex: 1;
+      min-width: 250px;
+    }
+    .customer-box {
+      background-color: #f8f9fa;
+      border: 1px solid #d0d7de;
+    }
+    .delivery-box {
+      background-color: #f0f7ff;
+      border: 1px solid #bfdcff;
+    }
+    .box-title {
+      font-size: 14px;
+      font-weight: bold;
+      color: #1a3a5f;
+      margin-bottom: 15px;
+      border-bottom: 1px solid #c1d8f0;
+      padding-bottom: 5px;
+    }
+    .info-row {
+      margin-bottom: 10px;
+      display: flex; 
+      flex-wrap: wrap;
+    }
+    .label {
+      font-weight: bold;
+      display: inline-block;
+      width: 120px;
+      color: #4a6584;
+    }
+    .value {
+      display: inline-block;
+      flex: 1;
+    }
+    .items-table {
+      margin: 30px 50px;
+      width: calc(100% - 100px);
+      border-collapse: collapse;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      border-radius: 5px;
+      overflow: hidden;
+    }
+    .table-header {
+      background-color: #1a3a5f;
+      color: white;
+      padding: 12px 10px;
+      text-align: left;
+    }
+    .table-row {
+      border-bottom: 1px solid #e1e8f0;
+    }
+    .table-row:nth-child(even) {
+      background-color: #f5f7fa;
+    }
+    .table-cell {
+      padding: 12px 10px;
+      vertical-align: top;
+    }
+    .properties {
+      font-size: 9px;
+      font-style: italic;
+      color: #627d98;
+      margin-top: 5px;
+    }
+    .summary-box {
+      background-color: #f0f7ff;
+      border: 1px solid #c1d8f0;
+      border-radius: 5px;
+      padding: 20px;
+      width: 400px;
+      margin-left: auto;
+      margin-right: 50px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    .summary-title {
+      font-size: 14px;
+      font-weight: bold;
+      color: #1a3a5f;
+      margin-bottom: 15px;
+      border-bottom: 1px solid #c1d8f0;
+      padding-bottom: 5px;
+    }
+    .summary-row {
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .summary-total {
+      font-weight: bold;
+      font-size: 13px;
+      margin-top: 10px;
+      padding-top: 8px;
+      border-top: 1px solid #c1d8f0;
+      display: flex;
+      justify-content: space-between;
+    }
+    .footer {
+      position: absolute;
+      bottom: 50px;
+      width: calc(100% - 100px);
+      border-top: 1px solid #d0d7de;
+      padding: 20px 0;
+      margin: 40px 50px 0;
+      text-align: center;
+      font-size: 11px;
+      color: #627d98;
+    }
+    .placeholder-text {
+      color: #f44336;
+      font-style: italic;
+    }
+    
+    
+    @media print {
+      body {
+        font-size: 12px;
+        color: #000;
+        background-color: #fff;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      .header {
+        padding: 15px 20px;
+        background-color: #f0f4f8 !important;
+        margin-bottom: 15px;
+      }
+      .order-number {
+        font-size: 24px;
+        color: #000 !important;
+      }
+      .info-boxes {
+        margin: 0 20px;
+        gap: 15px;
+        page-break-inside: avoid;
+      }
+      .customer-box, .delivery-box {
+        padding: 15px;
+        border: 1px solid #000 !important;
+        page-break-inside: avoid;
+      }
+      .customer-box {
+        background-color: #f8f9fa !important;
+      }
+      .delivery-box {
+        background-color: #f0f7ff !important;
+      }
+      .box-title {
+        color: #000 !important;
+        border-bottom: 1px solid #000 !important;
+      }
+      .items-table {
+        margin: 20px;
+        width: calc(100% - 40px);
+        box-shadow: none;
+        border: 1px solid #000 !important;
+        page-break-inside: avoid;
+      }
+      .table-header {
+        background-color: #1a3a5f !important;
+        color: #fff !important;
+        border-bottom: 1px solid #000;
+      }
+      .table-row {
+        border-bottom: 1px solid #000 !important;
+      }
+      .table-row:nth-child(even) {
+        background-color: #f5f7fa !important;
+      }
+      .summary-box {
+        margin: 20px 20px 20px auto;
+        padding: 15px;
+        width: 180px;
+        border: 1px solid #000 !important;
+        background-color: #f0f7ff !important;
+        box-shadow: none;
+        page-break-inside: avoid;
+      }
+      .summary-title {
+        color: #000 !important;
+      }
+      .summary-total {
+        border-top: 1px solid #000 !important;
+      }
+      .footer {
+        margin: 30px 20px 0;
+        border-top: 1px solid #000 !important;
+      }
+      /* Avoid page breaks inside critical elements */
+      tr, td, th, .info-row {
+        page-break-inside: avoid;
+      }
+      /* Remove box-shadow for print */
+      .items-table, .summary-box {
+        box-shadow: none !important;
+      }
+      /* Force showing background colors */
+      * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      /* Ensure placeholder text is visible */
+      .placeholder-text {
+        color: #f44336 !important;
+      }
+    }
+  </style>
+  </head>
+  <body>
+    <div class="header">
+      <div class="inner-header">
+        <h1 class="order-number">ORDER #<%= order.orderId %></h1>
+        <% if (category) { %>
+        <p class="category">Category: <%= category %></p>
+        <% } %>
+        <p class="timestamp">Generated: <%= new
+          Date().toLocaleDateString('en-US',
+          {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: true
+          }) %></p>
+      </div>
+
+    </div>
+
+    <div class="main">
+      <div class="info-boxes">
+        <div class="customer-box">
+          <h2 class="box-title">CUSTOMER</h2>
+          <% if (customer && customer.firstName && customer.lastName) { %>
+          <div class="info-row">
+            <span class="label">Name:</span>
+            <span class="value"><%= customer.firstName %> <%= customer.lastName
+              %></span>
+          </div>
+          <div class="info-row">
+            <span class="label">Email:</span>
+            <span class="value"><%= customer.email %></span>
+          </div>
+          <div class="info-row">
+            <span class="label">Phone:</span>
+            <span class="value"><%= customer.phone || 'Not provided' %></span>
+          </div>
+          <% } else { %>
+          <div class="info-row">
+            <span class="value placeholder-text">Please add customer details in
+              the system</span>
+          </div>
+          <% } %>
+        </div>
+        <div class="delivery-box">
+          <h2 class="box-title">DELIVERY DETAILS</h2>
+          <div class="info-row">
+            <span class="label">Method:</span>
+            <span class="value"><%= order.deliveryMethod || 'Standard Shipping'
+              %></span>
+          </div>
+          <% if (order.deliveryDate) { %>
+          <div class="info-row">
+            <span class="label">Date:</span>
+            <span class="value"><%= new
+              Date(order.deliveryDate).toLocaleDateString('en-US', {
+              weekday: 'long',
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric'
+              }) %></span>
+          </div>
+          <% } else { %>
+          <div class="info-row">
+            <span class="label">Date:</span>
+            <span class="value placeholder-text">To be confirmed</span>
+          </div>
+          <% } %>
+          <div class="info-row">
+            <span class="label">Time:</span>
+            <span class="value"><%= order.deliveryTime || 'To be confirmed'
+              %></span>
+          </div>
+          <div class="info-row">
+            <span class="label">Address:</span>
+            <span class="value"><%= order.deliveryAddress || 'To be confirmed'
+              %></span>
+          </div>
+          <% if (order.storeLocation) { %>
+          <div class="info-row">
+            <span class="label">Store:</span>
+            <span class="value"><%= order.storeLocation %></span>
+          </div>
+          <% } %>
+        </div>
+      </div>
+      <% if (items && items.length > 0) { %>
+      <table class="items-table">
+        <thead>
+          <tr>
+            <th class="table-header">QTY</th>
+            <th class="table-header">ITEM</th>
+            <th class="table-header">SKU</th>
+            <th class="table-header">PRICE</th>
+            <th class="table-header">TOTAL</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% let totalAmount = 0; %>
+          <% items.forEach(item => { %>
+          <% const lineTotal = item.quantity * item.price; %>
+          <% totalAmount += lineTotal; %>
+          <tr class="table-row">
+            <td class="table-cell"><%= item.quantity %></td>
+            <td class="table-cell">
+              <%= item.title %>
+              <% if (item.properties && item.properties.length > 0) { %>
+              <div class="properties">
+                <%= item.properties
+                .filter(p => p.name !== 'Category')
+                .map(p => `${p.name}: ${p.value}`)
+                .join(', ') %>
+              </div>
+              <% } %>
+            </td>
+            <td class="table-cell"><%= item.sku || 'N/A' %></td>
+            <td class="table-cell"><%= formatCurrency(item.price, currency)
+              %></td>
+            <td class="table-cell"><%= formatCurrency(lineTotal, currency)
+              %></td>
+          </tr>
+          <% }); %>
+        </tbody>
+      </table>
+      <div class="summary-box">
+        <h3 class="summary-title">ORDER SUMMARY</h3>
+        <div class="summary-row">
+          <span class="label">Items:</span>
+          <span class="value"><%= items.length %></span>
+        </div>
+        <div class="summary-row">
+          <span class="label">Total Items:</span>
+          <span class="value"><%= items.reduce((sum, item) => sum +
+            item.quantity,
+            0) %></span>
+        </div>
+        <div class="summary-total">
+          <span class="label">TOTAL:</span>
+          <span class="value"><%= formatCurrency(totalPrice.amount,
+            totalPrice.currency_code) %></span>
+        </div>
+      </div>
+      <% } else { %>
+      <div style="margin: 50px; text-align: center;">
+        <p>No items found for this order.</p>
+      </div>
+      <% } %>
+    </div>
+
+    <div class="footer">
+      <p>Thank you for your order! If you have any questions about your order
+        #<%= order.orderId %>, please contact our customer service.</p>
+    </div>
+  </body>
+</html>

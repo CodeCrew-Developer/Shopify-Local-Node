@@ -15,11 +15,13 @@ model Order {
   node             String?
   customAttributes Json
   deliveryAddress  String?
-  deliveryDate     DateTime?
+  deliveryDate     String?
   deliveryTime     String?
   storeLocation    String?
   deliveryMethod   String?
   createdAt        DateTime   @default(now())
+
+  OrderPdfs        OrderPdf[]
 }
 
 model Customer {
@@ -27,16 +29,27 @@ model Customer {
   email     String  @unique
   firstName String
   lastName  String
-  phone     String
+  phone     String?
   orders    Order[]
 }
 
-model LineItem {
-  id         BigInt  @id
-  order      Order   @relation(fields: [orderId], references: [id])
+model OrderPdf {
+  id         Int        @id @default(autoincrement())
+  order      Order      @relation(fields: [orderId], references: [id])
   orderId    Int
+  lineItems  LineItem[] // one PDF can be linked to many line items
   pdfPath    String
   status     String?
+  createdAt  DateTime   @default(now())
+}
+
+model LineItem {
+  id         BigInt     @id
+  order      Order      @relation(fields: [orderId], references: [id])
+  orderId    Int
+  orderPdf   OrderPdf?  @relation(fields: [orderPdfId], references: [id])
+  orderPdfId Int?
+
   title      String
   productId  BigInt
   variantId  BigInt
