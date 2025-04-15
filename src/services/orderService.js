@@ -97,10 +97,8 @@ async function processQueue() {
     const totalPrice = order.totalPrice;
 
     const deliveryTime = order.deliveryTime || new Date().toLocaleTimeString();
-    const deliveryAddress =
-      order.deliveryAddress ||
-      "Elmina Lakeside Mall, GF77 & GF78, Ground Floor, 5 & No 7, Persiaran Garcinia, Seksyen U15, 40170 Shah Alam, Selangor";
-    const storeLocation = order.storeLocation || "George Town";
+    const deliveryAddress = order.deliveryAddress || "Not specified";
+    const storeLocation = order.storeLocation || "Not specified";
     const deliveryMethod = order.deliveryMethod || "Not specified";
 
     // Create order record first

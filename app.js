@@ -5,6 +5,7 @@ let cookieParser = require("cookie-parser");
 let logger = require("morgan");
 
 let viewRouter = require("./src/routes/viewRouter/index");
+let apiRouter = require("./src/routes/apiRouter/index");
 require("./src/services/orderService");
 
 let app = express();
@@ -20,6 +21,7 @@ app.use(express.static(path.join(__dirname, "/order-pdf")));
 app.use(express.static(path.join(__dirname, "/public")));
 
 app.use("/", viewRouter);
+app.use("/api", apiRouter);
 
 app.use(function (req, res, next) {
   next(createError(404));

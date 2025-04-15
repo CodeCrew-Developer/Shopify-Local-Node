@@ -3,25 +3,24 @@ const router = express.Router();
 const dashboardController = require("../../controllers/dashboardController");
 const Intl = require("intl");
 
-router.get("/", function (req, res) {
-  res.redirect("/dashboard");
-})
+router.get("/", (req, res) => res.redirect("/dashboard"));
 
 router.get("/dashboard", dashboardController.getDashboard);
 
-function formatCurrency(value, currency, languageCode = "en-US") {
-  return new Intl.NumberFormat(languageCode, {
-    style: "currency",
-    currency: currency,
-  }).format(value);
-};
 router.get("/test", function (req, res) {
+  function formatCurrency(value, currency, languageCode = "en-US") {
+    return new Intl.NumberFormat(languageCode, {
+      style: "currency",
+      currency: currency,
+    }).format(value);
+  }
   const data = {
     order: {
       id: 1234,
       customerId: 1,
       node: null,
-      deliveryAddress: "Elmina Lakeside Mall, GF77 & GF78, Ground Floor, 5 & No 7, Persiaran Garcinia, Seksyen U15, 40170 Shah Alam, Selangor",
+      deliveryAddress:
+        "Elmina Lakeside Mall, GF77 & GF78, Ground Floor, 5 & No 7, Persiaran Garcinia, Seksyen U15, 40170 Shah Alam, Selangor",
       deliveryDate: new Date().toDateString(),
       deliveryTime: new Date().toLocaleTimeString(),
       storeLocation: "George Town",
@@ -165,11 +164,5 @@ router.get("/test", function (req, res) {
   };
   res.render("templates/order-template", data);
 });
-
-router.get("/pdf/view/:id", dashboardController.viewPdf);
-router.get("/pdf/download/:id", dashboardController.downloadPdf);
-router.post("/pdf/reprint/:id", dashboardController.reprintPdf);
-
-router.get("/export/csv", dashboardController.exportCsv);
 
 module.exports = router;

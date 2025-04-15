@@ -1,593 +1,491 @@
 <!-- views/dashboard.ejs -->
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>PDF Orders Dashboard</title>
-        <script src="https://cdn.tailwindcss.com"></script>
-        <link rel="stylesheet"
-            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-        <script>
-            tailwind.config = {
-            theme: {
-                extend: {
-                colors: {
-                    primary: {
-                    50: '#f0f9ff',
-                    100: '#e0f2fe',
-                    200: '#bae6fd',
-                    300: '#7dd3fc',
-                    400: '#38bdf8',
-                    500: '#0ea5e9',
-                    600: '#0284c7',
-                    700: '#0369a1',
-                    800: '#075985',
-                    900: '#0c4a6e'
-                    }
-                }
-                }
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PDF Orders Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: {
+              50: '#f0f9ff',
+              100: '#e0f2fe',
+              200: '#bae6fd',
+              300: '#7dd3fc',
+              400: '#38bdf8',
+              500: '#0ea5e9',
+              600: '#0284c7',
+              700: '#0369a1',
+              800: '#075985',
+              900: '#0c4a6e'
             }
-            }
+          }
+        }
+      }
+    }
   </script>
-    </head>
-    <body class="bg-gray-50">
-        <div class="min-h-screen">
-            <!-- Sidebar -->
-            <div
-                class="fixed inset-y-0 left-0 bg-white shadow-lg w-64 z-10 transform transition-transform duration-300 lg:translate-x-0"
-                id="sidebar">
-                <div class="flex items-center justify-between p-4 border-b">
-                    <h2 class="text-xl font-bold text-gray-800">PDF
-                        Dashboard</h2>
-                    <button id="closeSidebar"
-                        class="text-gray-500 hover:text-gray-700">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                <nav class="p-4">
-                    <ul class="space-y-2">
-                        <li>
-                            <a href="/dashboard"
-                                class="flex items-center p-2 text-gray-700 rounded-lg hover:bg-gray-100 group">
-                                <i
-                                    class="fas fa-chart-line w-6 text-gray-500 group-hover:text-primary-600"></i>
-                                <span class="ml-3">Dashboard</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="/dashboard?status=success"
-                                class="flex items-center p-2 text-gray-700 rounded-lg hover:bg-gray-100 group">
-                                <i
-                                    class="fas fa-check-circle w-6 text-green-500"></i>
-                                <span class="ml-3">Successful</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="/dashboard?status=failed"
-                                class="flex items-center p-2 text-gray-700 rounded-lg hover:bg-gray-100 group">
-                                <i
-                                    class="fas fa-times-circle w-6 text-red-500"></i>
-                                <span class="ml-3">Failed</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="/dashboard?status=pending"
-                                class="flex items-center p-2 text-gray-700 rounded-lg hover:bg-gray-100 group">
-                                <i class="fas fa-clock w-6 text-yellow-500"></i>
-                                <span class="ml-3">Pending</span>
-                            </a>
-                        </li>
-                        <li class="border-t pt-2 mt-2">
-                            <a href="/export/csv"
-                                class="flex items-center p-2 text-gray-700 rounded-lg hover:bg-gray-100 group">
-                                <i
-                                    class="fas fa-file-csv w-6 text-gray-500"></i>
-                                <span class="ml-3">Export CSV</span>
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
-            </div>
+</head>
 
-            <div class="lg:ml-64 transition-all duration-300">
-                <header class="bg-white shadow-sm border-b">
-                    <div class="flex items-center justify-between p-4">
-                        <div class="flex items-center">
-                            <button id="openSidebar"
-                                class="lg:hidden mr-2 text-gray-600 hover:text-gray-900">
-                                <i class="fas fa-bars"></i>
-                            </button>
-                            <h1 class="text-xl font-bold text-gray-800">PDF
-                                Orders Dashboard</h1>
-                        </div>
-                        <div>
-                            <button id="refreshBtn"
-                                class="text-gray-600 hover:text-gray-900 px-2">
-                                <i class="fas fa-sync-alt"></i>
-                            </button>
-                        </div>
-                    </div>
-                </header>
+<body class="bg-gray-50">
+  <div class="min-h-screen">
+    <!-- Sidebar -->
+    <div class="fixed inset-y-0 left-0 bg-white shadow-lg w-64 z-10 transform transition-transform duration-300 lg:translate-x-0" id="sidebar">
+      <div class="flex items-center justify-between p-4 border-b">
+        <h2 class="text-xl font-bold text-gray-800">PDF
+          Dashboard</h2>
+        <button id="closeSidebar" class="lg:hidden text-gray-500 hover:text-gray-700">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <nav class="p-4">
+        <ul class="space-y-2">
+          <li>
+            <a href="/dashboard" class="flex items-center p-2 text-gray-700 rounded-lg hover:bg-gray-100 group">
+              <i class="fas fa-chart-line w-6 text-gray-500 group-hover:text-primary-600"></i>
+              <span class="ml-3">Dashboard</span>
+            </a>
+          </li>
+          <li>
+            <a href="/dashboard?status=success" class="flex items-center p-2 text-gray-700 rounded-lg hover:bg-gray-100 group">
+              <i class="fas fa-check-circle w-6 text-green-500"></i>
+              <span class="ml-3">Successful</span>
+            </a>
+          </li>
+          <li>
+            <a href="/dashboard?status=failed" class="flex items-center p-2 text-gray-700 rounded-lg hover:bg-gray-100 group">
+              <i class="fas fa-times-circle w-6 text-red-500"></i>
+              <span class="ml-3">Failed</span>
+            </a>
+          </li>
+          <li>
+            <a href="/dashboard?status=pending" class="flex items-center p-2 text-gray-700 rounded-lg hover:bg-gray-100 group">
+              <i class="fas fa-clock w-6 text-yellow-500"></i>
+              <span class="ml-3">Pending</span>
+            </a>
+          </li>
+          <li class="border-t pt-2 mt-2">
+            <a href="/export/csv" class="flex items-center p-2 text-gray-700 rounded-lg hover:bg-gray-100 group">
+              <i class="fas fa-file-csv w-6 text-gray-500"></i>
+              <span class="ml-3">Export CSV</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
 
-                <main class="p-6">
-                    <!-- Stats Cards -->
-                    <div
-                        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-                        <div
-                            class="bg-white rounded-lg shadow-md p-6 transition-all hover:shadow-lg">
-                            <div class="flex items-center">
-                                <div
-                                    class="rounded-full bg-red-100 h-10 w-10 grid place-items-center">
-                                    <i
-                                        class="fas fa-file-pdf text-blue-500 fa-lg"></i>
-                                </div>
-                                <div class="ml-4">
-                                    <h3
-                                        class="text-gray-500 text-sm font-medium">Total
-                                        PDFs</h3>
-                                    <p
-                                        class="text-2xl font-bold text-gray-800"><%=
+    <div class="lg:ml-64 transition-all duration-300">
+      <header class="bg-white shadow-sm border-b">
+        <div class="flex items-center justify-between p-4">
+          <div class="flex items-center">
+            <button id="openSidebar" class="lg:hidden mr-2 text-gray-600 hover:text-gray-900">
+              <i class="fas fa-bars"></i>
+            </button>
+            <h1 class="text-xl font-bold text-gray-800">PDF
+              Orders Dashboard</h1>
+          </div>
+          <div>
+            <button id="refreshBtn" class="text-gray-600 hover:text-gray-900 px-2">
+              <i class="fas fa-sync-alt"></i>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <main class="p-6">
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+          <div class="bg-white rounded-lg shadow-md p-6 transition-all hover:shadow-lg">
+            <div class="flex items-center">
+              <div class="rounded-full bg-red-100 h-10 w-10 grid place-items-center">
+                <i class="fas fa-file-pdf text-blue-500 fa-lg"></i>
+              </div>
+              <div class="ml-4">
+                <h3 class="text-gray-500 text-sm font-medium">Total
+                  PDFs</h3>
+                <p class="text-2xl font-bold text-gray-800"><%=
                                         stats.total %></p>
-                                </div>
-                            </div>
-                        </div>
+              </div>
+            </div>
+          </div>
 
-                        <div
-                            class="bg-white rounded-lg shadow-md p-6 transition-all hover:shadow-lg">
-                            <div class="flex items-center">
-                                <div
-                                    class="rounded-full bg-red-100 h-10 w-10 grid place-items-center">
-                                    <i
-                                        class="fas fa-check text-green-500 fa-lg"></i>
-                                </div>
-                                <div class="ml-4">
-                                    <h3
-                                        class="text-gray-500 text-sm font-medium">Successful</h3>
-                                    <p
-                                        class="text-2xl font-bold text-gray-800"><%=
+          <div class="bg-white rounded-lg shadow-md p-6 transition-all hover:shadow-lg">
+            <div class="flex items-center">
+              <div class="rounded-full bg-red-100 h-10 w-10 grid place-items-center">
+                <i class="fas fa-check text-green-500 fa-lg"></i>
+              </div>
+              <div class="ml-4">
+                <h3 class="text-gray-500 text-sm font-medium">Successful</h3>
+                <p class="text-2xl font-bold text-gray-800"><%=
                                         stats.success %></p>
-                                </div>
-                            </div>
-                        </div>
+              </div>
+            </div>
+          </div>
 
-                        <div
-                            class="bg-white rounded-lg shadow-md p-6 transition-all hover:shadow-lg">
-                            <div class="flex items-center">
-                                <div
-                                    class="rounded-full bg-red-100 h-10 w-10 grid place-items-center">
-                                    <i
-                                        class="fas fa-times text-red-500 fa-lg"></i>
-                                </div>
-                                <div class="ml-4">
-                                    <h3
-                                        class="text-gray-500 text-sm font-medium">Failed</h3>
-                                    <p
-                                        class="text-2xl font-bold text-gray-800"><%=
+          <div class="bg-white rounded-lg shadow-md p-6 transition-all hover:shadow-lg">
+            <div class="flex items-center">
+              <div class="rounded-full bg-red-100 h-10 w-10 grid place-items-center">
+                <i class="fas fa-times text-red-500 fa-lg"></i>
+              </div>
+              <div class="ml-4">
+                <h3 class="text-gray-500 text-sm font-medium">Failed</h3>
+                <p class="text-2xl font-bold text-gray-800"><%=
                                         stats.failed %></p>
-                                </div>
-                            </div>
-                        </div>
+              </div>
+            </div>
+          </div>
 
-                        <div
-                            class="bg-white rounded-lg shadow-md p-6 transition-all hover:shadow-lg">
-                            <div class="flex items-center">
-                                <div
-                                    class="rounded-full bg-red-100 h-10 w-10 grid place-items-center">
-                                    <i
-                                        class="fas fa-clock text-yellow-500 fa-lg"></i>
-                                </div>
-                                <div class="ml-4">
-                                    <h3
-                                        class="text-gray-500 text-sm font-medium">Pending</h3>
-                                    <p
-                                        class="text-2xl font-bold text-gray-800"><%=
+          <div class="bg-white rounded-lg shadow-md p-6 transition-all hover:shadow-lg">
+            <div class="flex items-center">
+              <div class="rounded-full bg-red-100 h-10 w-10 grid place-items-center">
+                <i class="fas fa-clock text-yellow-500 fa-lg"></i>
+              </div>
+              <div class="ml-4">
+                <h3 class="text-gray-500 text-sm font-medium">Pending</h3>
+                <p class="text-2xl font-bold text-gray-800"><%=
                                         stats.pending %></p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
-                    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-                        <h2
-                            class="text-lg font-medium text-gray-800 mb-4">Filter
-                            Orders</h2>
-                        <form id="filterForm" method="GET" action="/dashboard">
-                            <div
-                                class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
-                                <div>
-                                    <label for="orderIdFilter"
-                                        class="block text-sm font-medium text-gray-700 mb-1">Order
-                                        ID</label>
-                                    <input type="text" id="orderIdFilter"
-                                        name="orderId"
-                                        value="<%= filters.orderId %>"
-                                        class="w-full rounded-md p-2 bg-gray-200 border-gray-300 shadow-sm focus:border-primary-500 focus:ring focus:ring-primary-500 focus:ring-opacity-50">
-                                </div>
-                                <div>
-                                    <label for="statusFilter"
-                                        class="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                                    <select id="statusFilter" name="status"
-                                        class="w-full rounded-md p-2 bg-gray-200 border-gray-300 shadow-sm focus:border-primary-500 focus:ring focus:ring-primary-500 focus:ring-opacity-50">
-                                        <option value <%=filters.status === '' ?
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+          <h2 class="text-lg font-medium text-gray-800 mb-4">Filter
+            Orders</h2>
+          <form id="filterForm" method="GET" action="/dashboard">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+              <div>
+                <label for="orderIdFilter" class="block text-sm font-medium text-gray-700 mb-1">Order
+                  ID</label>
+                <input type="text" id="orderIdFilter" name="orderId" value="<%= filters.orderId %>" class="w-full rounded-md p-2 bg-gray-200 border-gray-300 shadow-sm focus:border-primary-500 focus:ring focus:ring-primary-500 focus:ring-opacity-50">
+              </div>
+              <div>
+                <label for="statusFilter" class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                <select id="statusFilter" name="status" class="w-full rounded-md p-2 bg-gray-200 border-gray-300 shadow-sm focus:border-primary-500 focus:ring focus:ring-primary-500 focus:ring-opacity-50">
+                  <option value <%=filters.status === '' ?
                                             'selected' : '' %>>All</option>
-                                        <option value="success"
-                                            <%=filters.status === 'success' ?
+                  <option value="success" <%=filters.status === 'success' ?
                                             'selected' : '' %>>Success</option>
-                                        <option value="failed" <%=filters.status
+                  <option value="failed" <%=filters.status
                                             === 'failed' ? 'selected' : ''
                                             %>>Failed</option>
-                                        <option value="pending"
-                                            <%=filters.status === 'pending' ?
+                  <option value="pending" <%=filters.status === 'pending' ?
                                             'selected' : '' %>>Pending</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label for="categoryFilter"
-                                        class="block text-sm font-medium text-gray-700 mb-1">Category</label>
-                                    <select id="categoryFilter" name="category"
-                                        class="w-full rounded-md p-2 bg-gray-200 border-gray-300 shadow-sm focus:border-primary-500 focus:ring focus:ring-primary-500 focus:ring-opacity-50">
-                                        <option value>All</option>
-                                        <% categories.forEach(category => { %>
-                                        <option value="<%= category %>"
-                                            <%=filters.category === category ?
+                </select>
+              </div>
+              <div>
+                <label for="categoryFilter" class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                <select id="categoryFilter" name="category" class="w-full rounded-md p-2 bg-gray-200 border-gray-300 shadow-sm focus:border-primary-500 focus:ring focus:ring-primary-500 focus:ring-opacity-50">
+                  <option value>All</option>
+                  <% categories.forEach(category => { %>
+                  <option value="<%= category %>" <%=filters.category === category ?
                                             'selected' : '' %>>
-                                            <%= category %>
-                                        </option>
-                                        <% }); %>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label for="dateFrom"
-                                        class="block text-sm font-medium text-gray-700 mb-1">Date
-                                        From</label>
-                                    <input type="date" id="dateFrom"
-                                        name="dateFrom"
-                                        value="<%= filters.dateFrom %>"
-                                        class="w-full rounded-md p-2 bg-gray-200 border-gray-300 shadow-sm focus:border-primary-500 focus:ring focus:ring-primary-500 focus:ring-opacity-50">
-                                </div>
-                                <div>
-                                    <label for="dateTo"
-                                        class="block text-sm font-medium text-gray-700 mb-1">Date
-                                        To</label>
-                                    <input type="date" id="dateTo" name="dateTo"
-                                        value="<%= filters.dateTo %>"
-                                        class="w-full rounded-md p-2 bg-gray-200 border-gray-300 shadow-sm focus:border-primary-500 focus:ring focus:ring-primary-500 focus:ring-opacity-50">
-                                </div>
-                            </div>
-                            <div class="flex justify-end mt-4 space-x-3">
-                                <button type="button" id="resetFilters"
-                                    class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
-                                    Reset
-                                </button>
-                                <button type="submit"
-                                    class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700">
-                                    Apply Filters
-                                </button>
-                            </div>
-                        </form>
-                    </div>
+                    <%= category %>
+                  </option>
+                  <% }); %>
+                </select>
+              </div>
+              <div>
+                <label for="dateFrom" class="block text-sm font-medium text-gray-700 mb-1">Date
+                  From</label>
+                <input type="date" id="dateFrom" name="dateFrom" value="<%= filters.dateFrom %>" class="w-full rounded-md p-2 bg-gray-200 border-gray-300 shadow-sm focus:border-primary-500 focus:ring focus:ring-primary-500 focus:ring-opacity-50">
+              </div>
+              <div>
+                <label for="dateTo" class="block text-sm font-medium text-gray-700 mb-1">Date
+                  To</label>
+                <input type="date" id="dateTo" name="dateTo" value="<%= filters.dateTo %>" class="w-full rounded-md p-2 bg-gray-200 border-gray-300 shadow-sm focus:border-primary-500 focus:ring focus:ring-primary-500 focus:ring-opacity-50">
+              </div>
+            </div>
+            <div class="flex justify-end mt-4 space-x-3">
+              <button type="button" id="resetFilters" class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                Reset
+              </button>
+              <button type="submit" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700">
+                Apply Filters
+              </button>
+            </div>
+          </form>
+        </div>
 
-                    <!-- PDF Orders -->
-                    <div class="bg-white rounded-lg shadow-md overflow-hidden">
-                        <div
-                            class="px-6 py-4 border-b flex justify-between items-center">
-                            <h2 class="text-lg font-medium text-gray-800">PDF
-                                Orders</h2>
-                            <div class="flex items-center space-x-2">
-                                <button id="toggleView"
-                                    class="text-gray-500 hover:text-gray-700 px-2 py-1">
-                                    <i class="fas fa-th-large"></i>
-                                </button>
-                                <span class="text-gray-300">|</span>
-                                <span class="text-sm text-gray-500">Showing <%=
+        <!-- PDF Orders -->
+        <div class="bg-white rounded-lg shadow-md overflow-hidden">
+          <div class="px-6 py-4 border-b flex justify-between items-center">
+            <h2 class="text-lg font-medium text-gray-800">PDF
+              Orders</h2>
+            <div class="flex items-center space-x-2">
+              <button id="toggleView" class="text-gray-500 hover:text-gray-700 px-2 py-1">
+                <i class="fas fa-th-large"></i>
+              </button>
+              <span class="text-gray-300">|</span>
+              <span class="text-sm text-gray-500">Showing <%=
                                     Math.min((pagination.currentPage - 1) * 10 +
                                     1, stats.total) %>-<%=
                                     Math.min(pagination.currentPage * 10,
                                     stats.total) %> of <%= stats.total %></span>
-                            </div>
-                        </div>
+            </div>
+          </div>
 
-                        <!-- PDF List View -->
-                        <div id="listView" class="divide-y divide-gray-200">
-                            <% if (pdfs.length === 0) { %>
-                            <div class="py-12 text-center">
-                                <i
-                                    class="fas fa-file-pdf text-gray-300 text-5xl mb-4"></i>
-                                <p class="text-gray-500">No PDF orders found
-                                    matching your criteria</p>
-                            </div>
-                            <% } else { %>
-                            <% pdfs.forEach(pdf => { %>
-                            <div class="p-6 hover:bg-gray-50 transition-colors">
-                                <div
-                                    class="flex flex-col md:flex-row justify-between">
-                                    <div class="flex-1">
-                                        <div class="flex items-center">
-                                            <span class="mr-2">
-                                                <% if (pdf.status === 'success')
+          <!-- PDF List View -->
+          <div id="listView" class="divide-y divide-gray-200">
+            <% if (pdfs.length === 0) { %>
+            <div class="py-12 text-center">
+              <i class="fas fa-file-pdf text-gray-300 text-5xl mb-4"></i>
+              <p class="text-gray-500">No PDF orders found
+                matching your criteria</p>
+            </div>
+            <% } else { %>
+            <% pdfs.forEach(pdf => { %>
+            <div class="p-6 hover:bg-gray-50 transition-colors">
+              <div class="flex flex-col md:flex-row justify-between">
+                <div class="flex-1">
+                  <div class="flex items-center">
+                    <span class="mr-2">
+                      <% if (pdf.status === 'success')
                                                 { %>
-                                                <span
-                                                    class="w-3 h-3 rounded-full bg-green-500 inline-block"></span>
-                                                <% } else if (pdf.status ===
+                      <span class="w-3 h-3 rounded-full bg-green-500 inline-block"></span>
+                      <% } else if (pdf.status ===
                                                 'failed') { %>
-                                                <span
-                                                    class="w-3 h-3 rounded-full bg-red-500 inline-block"></span>
-                                                <% } else { %>
-                                                <span
-                                                    class="w-3 h-3 rounded-full bg-yellow-500 inline-block"></span>
-                                                <% } %>
-                                            </span>
-                                            <h3
-                                                class="text-lg font-medium text-gray-900">
-                                                <a
-                                                    href="/orders/<%= pdf.orderId %>"
-                                                    class="hover:underline">#<%=
+                      <span class="w-3 h-3 rounded-full bg-red-500 inline-block"></span>
+                      <% } else { %>
+                      <span class="w-3 h-3 rounded-full bg-yellow-500 inline-block"></span>
+                      <% } %>
+                    </span>
+                    <h3 class="text-lg font-medium text-gray-900">
+                      <a href="/orders/<%= pdf.orderId %>" class="hover:underline">#<%=
                                                     pdf.orderId %></a>
-                                            </h3>
-                                            <span
-                                                class="ml-3 px-2 py-1 text-xs rounded-full 
+                    </h3>
+                    <span class="ml-3 px-2 py-1 text-xs rounded-full 
                           <%= pdf.status === 'success' ? 'bg-green-100 text-green-800' : 
                              (pdf.status === 'failed' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800') %>">
-                                                <%= pdf.status %>
-                                            </span>
-                                        </div>
+                      <%= pdf.status %>
+                    </span>
+                  </div>
 
-                                        <div
-                                            class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-                                            <div>
-                                                <p
-                                                    class="text-sm text-gray-500">Category</p>
-                                                <p class="text-gray-900"><%=
+                  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                    <div>
+                      <p class="text-sm text-gray-500">Category</p>
+                      <p class="text-gray-900"><%=
                                                     pdf.category || 'N/A' %></p>
-                                            </div>
-                                            <div>
-                                                <p
-                                                    class="text-sm text-gray-500">Customer</p>
-                                                <p class="text-gray-900"><%=
+                    </div>
+                    <div>
+                      <p class="text-sm text-gray-500">Customer</p>
+                      <p class="text-gray-900"><%=
                                                     pdf.customer ?
                                                     `${pdf.customer.firstName}
                                                     ${pdf.customer.lastName}` :
                                                     'N/A' %></p>
-                                            </div>
-                                            <div>
-                                                <p
-                                                    class="text-sm text-gray-500">Created
-                                                    At</p>
-                                                <p class="text-gray-900"><%=
+                    </div>
+                    <div>
+                      <p class="text-sm text-gray-500">Created
+                        At</p>
+                      <p class="text-gray-900"><%=
                                                     formatDate(pdf.createdAt)
                                                     %></p>
-                                            </div>
-                                        </div>
+                    </div>
+                  </div>
 
-                                        <div class="mt-4">
-                                            <p
-                                                class="text-sm text-gray-500">Items
-                                                (<%= pdf.itemCount %>)</p>
-                                            <p
-                                                class="text-gray-600 text-sm mt-1 line-clamp-1">
-                                                <% if (pdf.lineItems &&
+                  <div class="mt-4">
+                    <p class="text-sm text-gray-500">Items
+                      (<%= pdf.itemCount %>)</p>
+                    <p class="text-gray-600 text-sm mt-1 line-clamp-1">
+                      <% if (pdf.lineItems &&
                                                 pdf.lineItems.length > 0) { %>
-                                                <%= pdf.lineItems.map(item =>
+                      <%= pdf.lineItems.map(item =>
                                                 item.title).join(', ') %>
-                                                <% } else { %>
-                                                No items found
-                                                <% } %>
-                                            </p>
-                                        </div>
-                                    </div>
+                      <% } else { %>
+                      No items found
+                      <% } %>
+                    </p>
+                  </div>
+                </div>
 
-                                    <div
-                                        class="flex items-center space-x-2 mt-4 md:mt-0">
-                                        <a href="/pdf/view/<%= pdf.id %>"
-                                            target="_blank"
-                                            class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-                                            <i class="fas fa-eye mr-2"></i>
-                                            View
-                                        </a>
-                                        <a href="/pdf/download/<%= pdf.id %>"
-                                            class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-                                            <i class="fas fa-download mr-2"></i>
-                                            Download
-                                        </a>
-                                        <% if (pdf.status === 'failed') { %>
-                                        <button data-id="<%= pdf.id %>"
-                                            class="reprint-btn inline-flex items-center px-3 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-yellow-600 hover:bg-yellow-700">
-                                            <i class="fas fa-print mr-2"></i>
-                                            Reprint
-                                        </button>
-                                        <% } %>
-                                    </div>
-                                </div>
-                            </div>
-                            <% }); %>
-                            <% } %>
-                        </div>
+                <div class="flex items-center space-x-2 mt-4 md:mt-0">
+                  <a href="/api/pdf/view/<%= pdf.id %>" target="_blank" class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                    <i class="fas fa-eye mr-2"></i>
+                    View
+                  </a>
+                  <a href="/api/pdf/download/<%= pdf.id %>" class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                    <i class="fas fa-download mr-2"></i>
+                    Download
+                  </a>
+                  <% if (pdf.status === 'failed') { %>
+                  <button data-id="<%= pdf.id %>" class="reprint-btn inline-flex items-center px-3 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-yellow-600 hover:bg-yellow-700">
+                    <i class="fas fa-print mr-2"></i>
+                    Reprint
+                  </button>
+                  <% } %>
+                </div>
+              </div>
+            </div>
+            <% }); %>
+            <% } %>
+          </div>
 
-                        <!-- Grid View (hidden by default) -->
-                        <div id="gridView"
-                            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6 hidden">
-                            <% if (pdfs.length === 0) { %>
-                            <div class="col-span-3 py-12 text-center">
-                                <i
-                                    class="fas fa-file-pdf text-gray-300 text-5xl mb-4"></i>
-                                <p class="text-gray-500">No PDF orders found
-                                    matching your criteria</p>
-                            </div>
-                            <% } else { %>
-                            <% pdfs.forEach(pdf => { %>
-                            <div
-                                class="bg-white border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                                <div class="p-4 border-b">
-                                    <div
-                                        class="flex justify-between items-center">
-                                        <div class="flex items-center">
-                                            <span class="mr-2">
-                                                <% if (pdf.status === 'success')
+          <div id="gridView" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6 hidden">
+            <% if (pdfs.length === 0) { %>
+            <div class="col-span-3 py-12 text-center">
+              <i class="fas fa-file-pdf text-gray-300 text-5xl mb-4"></i>
+              <p class="text-gray-500">No PDF orders found
+                matching your criteria</p>
+            </div>
+            <% } else { %>
+            <% pdfs.forEach(pdf => { %>
+            <div class="bg-white border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+              <div class="p-4 border-b">
+                <div class="flex justify-between items-center">
+                  <div class="flex items-center">
+                    <span class="mr-2">
+                      <% if (pdf.status === 'success')
                                                 { %>
-                                                <span
-                                                    class="w-3 h-3 rounded-full bg-green-500 inline-block"></span>
-                                                <% } else if (pdf.status ===
+                      <span class="w-3 h-3 rounded-full bg-green-500 inline-block"></span>
+                      <% } else if (pdf.status ===
                                                 'failed') { %>
-                                                <span
-                                                    class="w-3 h-3 rounded-full bg-red-500 inline-block"></span>
-                                                <% } else { %>
-                                                <span
-                                                    class="w-3 h-3 rounded-full bg-yellow-500 inline-block"></span>
-                                                <% } %>
-                                            </span>
-                                            <h3
-                                                class="font-medium text-gray-900">
-                                                <a
-                                                    href="/orders/<%= pdf.orderId %>"
-                                                    class="hover:underline">#<%=
+                      <span class="w-3 h-3 rounded-full bg-red-500 inline-block"></span>
+                      <% } else { %>
+                      <span class="w-3 h-3 rounded-full bg-yellow-500 inline-block"></span>
+                      <% } %>
+                    </span>
+                    <h3 class="font-medium text-gray-900">
+                      <a href="/orders/<%= pdf.orderId %>" class="hover:underline">#<%=
                                                     pdf.orderId %></a>
-                                            </h3>
-                                        </div>
-                                        <span
-                                            class="px-2 py-1 text-xs rounded-full 
-                        <%= pdf.status === 'success' ? 'bg-green-100 text-green-800' : 
-                           (pdf.status === 'failed' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800') %>">
-                                            <%= pdf.status %>
-                                        </span>
-                                    </div>
-                                </div>
+                    </h3>
+                  </div>
+                  <%
+                                        let bgColor;
+                                        if(pdf.status === 'success') {
+                                        bgColor = 'bg-green-100 text-green-800'
+                                        }else if(pdf.status === 'failed') {
+                                        bgColor = 'bg-red-100 text-red-800'
+                                        } else {
+                                        bgColor ='bg-yellow-100 text-yellow-800'
+                                        }
+                                        %>
+                  <span class="px-2 py-1 text-xs rounded-full <%= bgColor %>">
+                    <%= pdf.status %>
+                  </span>
+                </div>
+              </div>
 
-                                <div class="p-4">
-                                    <div class="mb-3">
-                                        <p
-                                            class="text-xs text-gray-500">Category</p>
-                                        <p class="text-sm text-gray-900"><%=
+              <div class="p-4">
+                <div class="mb-3">
+                  <p class="text-xs text-gray-500">Category</p>
+                  <p class="text-sm text-gray-900"><%=
                                             pdf.category || 'N/A' %></p>
-                                    </div>
+                </div>
 
-                                    <div class="mb-3">
-                                        <p
-                                            class="text-xs text-gray-500">Customer</p>
-                                        <p class="text-sm text-gray-900"><%=
+                <div class="mb-3">
+                  <p class="text-xs text-gray-500">Customer</p>
+                  <p class="text-sm text-gray-900"><%=
                                             pdf.customer ?
                                             `${pdf.customer.firstName}
                                             ${pdf.customer.lastName}` : 'N/A'
                                             %></p>
-                                    </div>
+                </div>
 
-                                    <div class="mb-3">
-                                        <p class="text-xs text-gray-500">Created
-                                            At</p>
-                                        <p class="text-sm text-gray-900"><%=
+                <div class="mb-3">
+                  <p class="text-xs text-gray-500">Created
+                    At</p>
+                  <p class="text-sm text-gray-900"><%=
                                             formatDate(pdf.createdAt) %></p>
-                                    </div>
+                </div>
 
-                                    <div>
-                                        <p class="text-xs text-gray-500">Items
-                                            (<%= pdf.itemCount %>)</p>
-                                        <p
-                                            class="text-xs text-gray-600 mt-1 line-clamp-1">
-                                            <% if (pdf.lineItems &&
+                <div>
+                  <p class="text-xs text-gray-500">Items
+                    (<%= pdf.itemCount %>)</p>
+                  <p class="text-xs text-gray-600 mt-1 line-clamp-1">
+                    <% if (pdf.lineItems &&
                                             pdf.lineItems.length > 0) { %>
-                                            <%= pdf.lineItems.map(item =>
+                    <%= pdf.lineItems.map(item =>
                                             item.title).join(', ') %>
-                                            <% } else { %>
-                                            No items found
-                                            <% } %>
-                                        </p>
-                                    </div>
-                                </div>
+                    <% } else { %>
+                    No items found
+                    <% } %>
+                  </p>
+                </div>
+              </div>
 
-                                <div
-                                    class="p-4 bg-gray-50 flex justify-between items-center">
-                                    <div class="flex space-x-2">
-                                        <a href="/pdf/view/<%= pdf.id %>"
-                                            target="_blank"
-                                            class="text-gray-600 hover:text-gray-900">
-                                            <i class="fas fa-eye"></i>
-                                        </a>
-                                        <a href="/pdf/download/<%= pdf.id %>"
-                                            class="text-gray-600 hover:text-gray-900">
-                                            <i class="fas fa-download"></i>
-                                        </a>
-                                    </div>
+              <div class="p-4 bg-gray-50 flex justify-between items-center">
+                <div class="flex space-x-2">
+                  <a href="/api/pdf/view/<%= pdf.id %>" target="_blank" class="text-gray-600 hover:text-gray-900">
+                    <i class="fas fa-eye"></i>
+                  </a>
+                  <a href="/api/pdf/download/<%= pdf.id %>" class="text-gray-600 hover:text-gray-900">
+                    <i class="fas fa-download"></i>
+                  </a>
+                </div>
 
-                                    <% if (pdf.status === 'failed') { %>
-                                    <button data-id="<%= pdf.id %>"
-                                        class="reprint-btn text-xs px-2 py-1 bg-yellow-600 text-white rounded hover:bg-yellow-700">
-                                        Reprint
-                                    </button>
-                                    <% } %>
-                                </div>
-                            </div>
-                            <% }); %>
-                            <% } %>
-                        </div>
-
-                        <!-- Pagination -->
-                        <div class="px-6 py-4 border-t">
-                            <div class="flex items-center justify-between">
-                                <div
-                                    class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
-                                    <div>
-                                        <p class="text-sm text-gray-700">
-                                            Showing page <span
-                                                class="font-medium"><%=
-                                                pagination.currentPage %></span>
-                                            of <span class="font-medium"><%=
-                                                pagination.totalPages %></span>
-                                        </p>
-                                    </div>
-                                    <div>
-                                        <nav
-                                            class="isolate inline-flex -space-x-px rounded-md shadow-sm"
-                                            aria-label="Pagination">
-                                            <a
-                                                href="?page=<%= pagination.currentPage - 1 %>&<%= pagination.queryParams %>"
-                                                class="<%= pagination.currentPage === 1 ? 'pointer-events-none opacity-50' : '' %> relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
-                                                <i
-                                                    class="fas fa-chevron-left text-xs"></i>
-                                            </a>
-
-                                            <% for(let i = 1; i <=
-                                            pagination.totalPages; i++) { %>
-                                            <a
-                                                href="?page=<%= i %>&<%= pagination.queryParams %>"
-                                                class="relative inline-flex items-center px-4 py-2 text-sm font-semibold <%= pagination.currentPage === i ? 'bg-primary-600 text-white' : 'text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50' %>">
-                                                <%= i %>
-                                            </a>
-                                            <% } %>
-
-                                            <a
-                                                href="?page=<%= pagination.currentPage + 1 %>&<%= pagination.queryParams %>"
-                                                class="<%= pagination.currentPage === pagination.totalPages ? 'pointer-events-none opacity-50' : '' %> relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
-                                                <i
-                                                    class="fas fa-chevron-right text-xs"></i>
-                                            </a>
-                                        </nav>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </main>
+                <% if (pdf.status === 'failed') { %>
+                <button data-id="<%= pdf.id %>" class="reprint-btn text-xs px-2 py-1 bg-yellow-600 text-white rounded hover:bg-yellow-700">
+                  Reprint
+                </button>
+                <% } %>
+              </div>
             </div>
-        </div>
+            <% }); %>
+            <% } %>
+          </div>
 
-        <script>
+          <!-- Pagination -->
+          <div class="px-6 py-4 border-t">
+            <div class="flex items-center justify-between">
+              <div class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
+                <div>
+                  <p class="text-sm text-gray-700">
+                    Showing page <span class="font-medium"><%=
+                                                pagination.currentPage %></span>
+                    of <span class="font-medium"><%=
+                                                pagination.totalPages %></span>
+                  </p>
+                </div>
+                <div>
+                  <nav class="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
+                    <a href="?page=<%= pagination.currentPage - 1 %>&<%= pagination.queryParams %>" class="<%= pagination.currentPage === 1 ? 'pointer-events-none opacity-50' : '' %> relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
+                      <i class="fas fa-chevron-left text-xs"></i>
+                    </a>
+
+                    <% for(let i = 1; i <=
+                                            pagination.totalPages; i++) { %>
+                    <a href="?page=<%= i %>&<%= pagination.queryParams %>" class="relative inline-flex items-center px-4 py-2 text-sm font-semibold <%= pagination.currentPage === i ? 'bg-primary-600 text-white' : 'text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50' %>">
+                      <%= i %>
+                    </a>
+                    <% } %>
+
+                    <a href="?page=<%= pagination.currentPage + 1 %>&<%= pagination.queryParams %>" class="<%= pagination.currentPage === pagination.totalPages ? 'pointer-events-none opacity-50' : '' %> relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
+                      <i class="fas fa-chevron-right text-xs"></i>
+                    </a>
+                  </nav>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script>
     document.addEventListener('DOMContentLoaded', function() {
       const sidebar = document.getElementById('sidebar');
       const openSidebar = document.getElementById('openSidebar');
       const closeSidebar = document.getElementById('closeSidebar');
-      
+
       if (openSidebar) {
         openSidebar.addEventListener('click', function() {
           sidebar.classList.remove('-translate-x-full');
         });
       }
-      
+
       if (closeSidebar) {
         closeSidebar.addEventListener('click', function() {
           sidebar.classList.add('-translate-x-full');
         });
       }
-      
+
       document.getElementById('resetFilters').addEventListener('click', function() {
         window.location.href = '/dashboard';
       });
@@ -595,11 +493,11 @@
       document.getElementById('refreshBtn').addEventListener('click', function() {
         window.location.reload();
       });
-      
+
       const listView = document.getElementById('listView');
       const gridView = document.getElementById('gridView');
       const toggleView = document.getElementById('toggleView');
-      
+
       if (toggleView) {
         toggleView.addEventListener('click', function() {
           if (listView.classList.contains('hidden')) {
@@ -617,57 +515,58 @@
       document.querySelectorAll('.reprint-btn').forEach(btn => {
         btn.addEventListener('click', function() {
           const pdfId = this.getAttribute('data-id');
-          
+
           const originalText = this.innerHTML;
           this.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Printing...';
           this.disabled = true;
-          
-          fetch(`/pdf/reprint/${pdfId}`, {
-            method: 'POST',
-          })
-          .then(response => response.json())
-          .then(data => {
-            if (data.success) {
-              this.innerHTML = '<i class="fas fa-check mr-2"></i>Printed';
-              this.classList.remove('bg-yellow-600', 'hover:bg-yellow-700');
-              this.classList.add('bg-green-600', 'hover:bg-green-700');
-              
-              setTimeout(() => {
-                window.location.reload();
-              }, 1500);
-            } else {
+
+          fetch(`/api/pdf/reprint/${pdfId}`, {
+              method: 'POST',
+            })
+            .then(response => response.json())
+            .then(data => {
+              if (data.success) {
+                this.innerHTML = '<i class="fas fa-check mr-2"></i>Printed';
+                this.classList.remove('bg-yellow-600', 'hover:bg-yellow-700');
+                this.classList.add('bg-green-600', 'hover:bg-green-700');
+
+                setTimeout(() => {
+                  window.location.reload();
+                }, 1500);
+              } else {
+                this.innerHTML = '<i class="fas fa-exclamation-circle mr-2"></i>Failed';
+                this.classList.remove('bg-yellow-600', 'hover:bg-yellow-700');
+                this.classList.add('bg-red-600', 'hover:bg-red-700');
+
+                alert('Error: ' + data.message);
+
+                setTimeout(() => {
+                  this.innerHTML = originalText;
+                  this.classList.remove('bg-red-600', 'hover:bg-red-700');
+                  this.classList.add('bg-yellow-600', 'hover:bg-yellow-700');
+                  this.disabled = false;
+                }, 2000);
+              }
+            })
+            .catch(error => {
+              console.error('Error:', error);
               this.innerHTML = '<i class="fas fa-exclamation-circle mr-2"></i>Failed';
               this.classList.remove('bg-yellow-600', 'hover:bg-yellow-700');
               this.classList.add('bg-red-600', 'hover:bg-red-700');
-              
-              alert('Error: ' + data.message);
-              
+
+              alert('An error occurred while processing your request');
+
               setTimeout(() => {
                 this.innerHTML = originalText;
                 this.classList.remove('bg-red-600', 'hover:bg-red-700');
                 this.classList.add('bg-yellow-600', 'hover:bg-yellow-700');
                 this.disabled = false;
               }, 2000);
-            }
-          })
-          .catch(error => {
-            console.error('Error:', error);
-            this.innerHTML = '<i class="fas fa-exclamation-circle mr-2"></i>Failed';
-            this.classList.remove('bg-yellow-600', 'hover:bg-yellow-700');
-            this.classList.add('bg-red-600', 'hover:bg-red-700');
-            
-            alert('An error occurred while processing your request');
-            
-            setTimeout(() => {
-              this.innerHTML = originalText;
-              this.classList.remove('bg-red-600', 'hover:bg-red-700');
-              this.classList.add('bg-yellow-600', 'hover:bg-yellow-700');
-              this.disabled = false;
-            }, 2000);
-          });
+            });
         });
       });
     });
   </script>
-    </body>
+</body>
+
 </html>
