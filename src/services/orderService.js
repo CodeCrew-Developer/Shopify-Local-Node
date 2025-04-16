@@ -9,7 +9,9 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 const socket = new WebSocket(
-  "wss://shopify-server-production-3541.up.railway.app"
+  // "wss://shopify-server-production-3541.up.railway.app"
+  "wss://b661-223-181-179-100.ngrok-free.app?category=pastries"
+  // "ws://localhost:8080?category=bread"
 );
 
 let isProcessing = false;
@@ -25,6 +27,15 @@ function formatCurrency(value, currency, languageCode = "en-US") {
     style: "currency",
     currency: currency,
   }).format(value);
+}
+function formatAddress(address) {
+  return `
+${address.address1}
+${address.address2 ? address.address2 + "\n" : ""}${
+    address.company ? address.company + "\n" : ""
+  }${address.city}, ${address.province_code} ${address.zip}
+${address.country}
+`.trim();
 }
 
 async function generatePdfFromHtml(html, outputPath) {
@@ -79,8 +90,7 @@ async function processQueue() {
     const groupedItems = {};
     order.lineItem.forEach((item) => {
       const category =
-        item.properties?.find((p) => p.name === "Category")?.value ||
-        "Uncategorized";
+        item.properties['Category'] || "Uncategorized";
       if (!groupedItems[category]) groupedItems[category] = [];
       groupedItems[category].push(item);
     });
@@ -96,22 +106,24 @@ async function processQueue() {
     const languageCode = order.languageCode;
     const totalPrice = order.totalPrice;
 
-    const deliveryTime = order.deliveryTime || new Date().toLocaleTimeString();
-    const deliveryAddress = order.deliveryAddress || "Not specified";
-    const storeLocation = order.storeLocation || "Not specified";
-    const deliveryMethod = order.deliveryMethod || "Not specified";
+    const deliveryTime = order.deliveryTime;
+    const deliveryDate = order.deliveryDate;
+    const deliveryAddress = order.deliveryAddress;
+    const storeLocation = order.storeLocation;
+    const deliveryMethod = order.deliveryMethod;
+    const orderNote = order.orderNote;
 
     // Create order record first
     const createdOrder = await prisma.order.create({
       data: {
         id: order.orderId,
         customerId: customer.id,
-        deliveryAddress: deliveryAddress,
-        deliveryDate: order.deliveryDate || new Date().toDateString(),
-        deliveryTime: deliveryTime,
-        storeLocation: storeLocation,
-        deliveryMethod: deliveryMethod,
-        node: order.node || null,
+        deliveryAddress,
+        deliveryDate,
+        deliveryTime,
+        storeLocation,
+        deliveryMethod,
+        node: orderNote,
         customAttributes: order.customAttributes || {},
       },
     });
@@ -136,11 +148,12 @@ async function processQueue() {
         order: {
           ...createdOrder,
           orderId: order.orderId,
-          deliveryDate: order.deliveryDate,
-          deliveryTime: deliveryTime,
-          deliveryAddress: deliveryAddress,
-          storeLocation: storeLocation,
-          deliveryMethod: deliveryMethod,
+          deliveryDate,
+          deliveryTime,
+          deliveryAddress,
+          storeLocation,
+          deliveryMethod,
+          note: orderNote,
         },
         customer: customer,
         items: items.map((item) => ({
@@ -173,7 +186,7 @@ async function processQueue() {
       for (const item of items) {
         await prisma.lineItem.create({
           data: {
-            id: BigInt(item.id),
+            id: BigInt(item.id || item.key),
             orderId: order.orderId,
             orderPdfId: orderPdf.id,
             title: item.name,
@@ -228,7 +241,7 @@ socket.on("open", () => {
 
 socket.on("message", (data) => {
   const parsed = JSON.parse(data);
-  console.log(parsed, "parsed");
+  
   const customer = {
     email: parsed.customer.email,
     first_name: parsed.customer.first_name,
@@ -236,22 +249,40 @@ socket.on("message", (data) => {
     phone: parsed.customer.phone,
   };
 
+  const deliveryDate = parsed.note_attributes.find((i) => i.name.includes("Delivery-Date") || i.name.includes("Pickup-Date") )?.value;
+  const deliveryTime = parsed.note_attributes.find((i) => i.name.includes("Delivery-Time") || i.name.includes("Pickup-Time"))?.value;
+  const deliveryAddress = formatAddress(parsed.shipping_address || parsed.billing_address);
+
+  const numOfCandles = parsed.note_attributes.find((i) => i.name.split(" ").pop() == "Candles")?.value;
+  const orderNote = parsed.note;
+  const storeLocation = parsed.note_attributes.find((i) =>i.name.includes("Pickup-Location-Company"))?.value;
+
   const lineItems = parsed?.line_items || [];
-  const totalPrice = parsed?.total_price_set.presentment_money;
+  const totalPrice = parsed?.total_price_set;
 
   const filteredLineItems = lineItems.map((item) => {
-    const categoryProp = item.properties?.find((p) => p.name === "Category");
-    const category = categoryProp?.value || "Uncategorized";
-    return { ...item, category };
+    const categoryProp = item.properties.Category;
+    const category = categoryProp || "Uncategorized";
+    return {
+      ...item,
+      category,
+    };
   });
 
   const response = {
     orderId: parsed.order_number,
-    currency: parsed.presentment_currency,
+    currency: parsed.presentment_currency || "MYR",
     totalPrice,
     languageCode: parsed.customer_locale,
     customer: customer,
     lineItem: filteredLineItems,
+    deliveryDate,
+    deliveryTime,
+    deliveryAddress,
+    numOfCandles,
+    orderNote,
+    storeLocation:storeLocation,
+    deliveryMethod: storeLocation ? "Pickup" : "Delivery",
   };
   console.log("Received order:", response);
   enqueueOrder(response);
