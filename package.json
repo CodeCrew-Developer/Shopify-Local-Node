@@ -3,12 +3,14 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "start": "nodemon ./bin/www"
+    "start": "node ./bin/www",
+    "postinstall": "prisma generate && pm2 start ./bin/www --name auto-printing && pm2 save"
   },
   "dependencies": {
     "@prisma/client": "^6.6.0",
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
+    "dotenv": "^16.5.0",
     "ejs": "~2.6.1",
     "express": "~4.16.1",
     "http-errors": "~1.6.3",
@@ -18,6 +20,7 @@
     "node-windows": "^1.0.0-beta.8",
     "pdf-to-printer": "^5.6.0",
     "pdfkit": "^0.16.0",
+    "pm2": "^6.0.5",
     "puppeteer": "^24.6.1",
     "sqlite3": "^5.1.7",
     "ws": "^8.18.1"

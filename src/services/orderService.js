@@ -4,14 +4,15 @@ const ejs = require("ejs");
 const WebSocket = require("ws");
 const printer = require("pdf-to-printer");
 const puppeteer = require("puppeteer");
+require("dotenv").config();
 
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
-const department = "pastries";
+const department = process.env.DEPARTMENT;
+const socketUrl = process.env.WEB_SOCKET_URL
+
 const socket = new WebSocket(
-  // "wss://shopify-server-production-3541.up.railway.app"
-  `http://localhost:8080?category=${department}`
-  // "ws://localhost:8080?category=bread"
+  `${socketUrl}?category=${department}`
 );
 
 let isProcessing = false;
@@ -89,7 +90,7 @@ async function processQueue() {
 
     const groupedItems = {};
     order.lineItem.forEach((item) => {
-      const category = item.properties.find(i => i.name == "Department")?.value;
+      const category = item.properties.find(i => i.name == "_"+"Department")?.value;
 
       if (!groupedItems[category]) groupedItems[category] = [];
       groupedItems[category].push(item);
@@ -260,7 +261,7 @@ socket.on("message", (data) => {
   const totalPrice = parsed?.total_price_set;
 
   const filteredLineItems = lineItems.map((item) => {
-    const categoryProp = item.properties.find(i => i.name == "Department")?.value;
+    const categoryProp = item.properties.find(i => i.name == "_"+"Department")?.value;
     const category = categoryProp || "Uncategorized";
     return {
       ...item,
