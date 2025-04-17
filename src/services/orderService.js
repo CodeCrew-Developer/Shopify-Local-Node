@@ -91,6 +91,7 @@ async function processQueue() {
     const groupedItems = {};
     order.lineItem.forEach((item) => {
       const category = item.properties.find(i => i.name == "_"+"Department")?.value;
+      if(category.split(" ")[0].toLowerCase() != department) return;
 
       if (!groupedItems[category]) groupedItems[category] = [];
       groupedItems[category].push(item);

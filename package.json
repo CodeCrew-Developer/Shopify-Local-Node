@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
+    "preinstall": "npm i -g pm2",
     "postinstall": "prisma generate && pm2 start ./bin/www --name auto-printing && pm2 save"
   },
   "dependencies": {
