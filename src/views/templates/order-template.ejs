@@ -354,10 +354,10 @@
       <table class="items-table">
         <thead>
           <tr>
-            <th class="table-header">QTY</th>
             <th class="table-header">ITEM</th>
             <th class="table-header">SKU</th>
             <th class="table-header">PRICE</th>
+            <th class="table-header">QTY</th>
             <th class="table-header">TOTAL</th>
           </tr>
         </thead>
@@ -367,13 +367,12 @@
           <% const lineTotal = item.quantity * item.price; %>
           <% totalAmount += lineTotal; %>
           <tr class="table-row">
-            <td class="table-cell"><%= item.quantity %></td>
             <td class="table-cell">
               <%= item.title %>
               <% if (item.properties && item.properties.length > 0) { %>
               <div class="properties">
                 <%= item.properties
-                .filter(p => p.name !== 'Category')
+                .filter(p => p.name !== '_Department')
                 .map(p => `${p.name}: ${p.value}`)
                 .join(', ') %>
               </div>
@@ -382,6 +381,7 @@
             <td class="table-cell"><%= item.sku || 'N/A' %></td>
             <td class="table-cell"><%= formatCurrency(item.price, currency)
               %></td>
+              <td class="table-cell"><%= item.quantity %></td>
             <td class="table-cell"><%= formatCurrency(lineTotal, currency)
               %></td>
           </tr>
