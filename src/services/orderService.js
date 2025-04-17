@@ -285,6 +285,5 @@ socket.on("message", (data) => {
     storeLocation:storeLocation,
     deliveryMethod: storeLocation ? "Pickup" : "Delivery",
   };
-  console.log("Received order:", response);
   enqueueOrder(response);
 });
