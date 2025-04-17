@@ -7,10 +7,10 @@ const puppeteer = require("puppeteer");
 
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
-
+const department = "pastries";
 const socket = new WebSocket(
   // "wss://shopify-server-production-3541.up.railway.app"
-  "wss://b661-223-181-179-100.ngrok-free.app?category=pastries"
+  `http://localhost:8080?category=${department}`
   // "ws://localhost:8080?category=bread"
 );
 
@@ -89,8 +89,8 @@ async function processQueue() {
 
     const groupedItems = {};
     order.lineItem.forEach((item) => {
-      const category =
-        item.properties['Category'] || "Uncategorized";
+      const category = item.properties.find(i => i.name == "Department")?.value;
+
       if (!groupedItems[category]) groupedItems[category] = [];
       groupedItems[category].push(item);
     });
@@ -170,7 +170,6 @@ async function processQueue() {
         totalPrice: totalPrice,
         formatCurrency: formatCurrency,
       };
-      console.log(JSON.stringify(templateData), "templateData");
       const renderedHtml = ejs.render(template, templateData);
 
       await generatePdfFromHtml(renderedHtml, pdfPath);
@@ -261,7 +260,7 @@ socket.on("message", (data) => {
   const totalPrice = parsed?.total_price_set;
 
   const filteredLineItems = lineItems.map((item) => {
-    const categoryProp = item.properties.Category;
+    const categoryProp = item.properties.find(i => i.name == "Department")?.value;
     const category = categoryProp || "Uncategorized";
     return {
       ...item,
