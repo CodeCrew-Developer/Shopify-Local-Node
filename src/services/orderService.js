@@ -9,11 +9,9 @@ require("dotenv").config();
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 const department = process.env.DEPARTMENT;
-const socketUrl = process.env.WEB_SOCKET_URL
+const socketUrl = process.env.WEB_SOCKET_URL;
 
-const socket = new WebSocket(
-  `${socketUrl}?category=${department}`
-);
+const socket = new WebSocket(`${socketUrl}?category=${department}`);
 
 let isProcessing = false;
 const pendingOrders = [];
@@ -90,8 +88,10 @@ async function processQueue() {
 
     const groupedItems = {};
     order.lineItem.forEach((item) => {
-      const category = item.properties.find(i => i.name == "_"+"Department")?.value;
-      if(category.split(" ")[0].toLowerCase() != department) return;
+      const category = item.properties.find(
+        (i) => i.name == "_" + "Department"
+      )?.value;
+      if (category.split(" ")[0].toLowerCase() != department) return;
 
       if (!groupedItems[category]) groupedItems[category] = [];
       groupedItems[category].push(item);
@@ -156,6 +156,7 @@ async function processQueue() {
           storeLocation,
           deliveryMethod,
           note: orderNote,
+          customAttributes: order.customAttributes,
         },
         customer: customer,
         items: items.map((item) => ({
@@ -242,33 +243,52 @@ socket.on("open", () => {
 
 socket.on("message", (data) => {
   const parsed = JSON.parse(data);
-  
+
   const customer = {
     email: parsed.customer.email,
     first_name: parsed.customer.first_name,
     last_name: parsed.customer.last_name,
-    phone: parsed.customer.phone,
+    phone:
+      parsed.customer.phone ||
+      parsed.shipping_address?.phone ||
+      parsed.billing_address?.phone,
   };
 
-  const deliveryDate = parsed.note_attributes.find((i) => i.name.includes("Delivery-Date") || i.name.includes("Pickup-Date") )?.value;
-  const deliveryTime = parsed.note_attributes.find((i) => i.name.includes("Delivery-Time") || i.name.includes("Pickup-Time"))?.value;
-  const deliveryAddress = formatAddress(parsed.shipping_address || parsed.billing_address);
+  const deliveryDate = parsed.note_attributes.find(
+    (i) => i.name.includes("Delivery-Date") || i.name.includes("Pickup-Date")
+  )?.value;
+  const deliveryTime = parsed.note_attributes.find(
+    (i) => i.name.includes("Delivery-Time") || i.name.includes("Pickup-Time")
+  )?.value;
+  const deliveryAddress = formatAddress(
+    parsed.shipping_address || parsed.billing_address
+  );
 
-  const numOfCandles = parsed.note_attributes.find((i) => i.name.split(" ").pop() == "Candles")?.value;
+  const numOfCandles = parsed.note_attributes.find(
+    (i) => i.name.split(" ").pop() == "Candles"
+  )?.value;
   const orderNote = parsed.note;
-  const storeLocation = parsed.note_attributes.find((i) =>i.name.includes("Pickup-Location-Company"))?.value;
+  const storeLocation = parsed.note_attributes.find((i) =>
+    i.name.includes("Pickup-Location-Company")
+  )?.value;
 
   const lineItems = parsed?.line_items || [];
   const totalPrice = parsed?.total_price_set;
 
   const filteredLineItems = lineItems.map((item) => {
-    const categoryProp = item.properties.find(i => i.name == "_"+"Department")?.value;
+    const categoryProp = item.properties.find(
+      (i) => i.name == "_" + "Department"
+    )?.value;
     const category = categoryProp || "Uncategorized";
     return {
       ...item,
       category,
     };
   });
+  let customAttributes = {};
+  if (numOfCandles) {
+    customAttributes["No. of candles"] = numOfCandles;
+  }
 
   const response = {
     orderId: parsed.order_number,
@@ -280,9 +300,9 @@ socket.on("message", (data) => {
     deliveryDate,
     deliveryTime,
     deliveryAddress,
-    numOfCandles,
+    customAttributes,
     orderNote,
-    storeLocation:storeLocation,
+    storeLocation: storeLocation,
     deliveryMethod: storeLocation ? "Pickup" : "Delivery",
   };
   enqueueOrder(response);
