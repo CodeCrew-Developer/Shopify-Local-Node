@@ -318,7 +318,7 @@
           <h2 class="box-title">DELIVERY DETAILS</h2>
           <div class="info-row">
             <span class="label">Method:</span>
-            <span class="value"><%= order.deliveryMethod || 'Standard Shipping'
+            <span class="value" style="text-transform: capitalize;"><%= order.deliveryMethod || 'Standard Shipping'
               %></span>
           </div>
           <% if (order.deliveryDate) { %>

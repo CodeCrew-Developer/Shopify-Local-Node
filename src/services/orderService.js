@@ -271,6 +271,9 @@ socket.on("message", (data) => {
   const storeLocation = parsed.note_attributes.find((i) =>
     i.name.includes("Pickup-Location-Company")
   )?.value;
+  const deliveryMethod = parsed.note_attributes.find((i) =>
+    i.name.includes("Checkout-Method")
+  )?.value;
 
   const lineItems = parsed?.line_items || [];
   const totalPrice = parsed?.total_price_set;
@@ -303,7 +306,7 @@ socket.on("message", (data) => {
     customAttributes,
     orderNote,
     storeLocation: storeLocation,
-    deliveryMethod: storeLocation ? "Pickup" : "Delivery",
+    deliveryMethod,
   };
   enqueueOrder(response);
 });
