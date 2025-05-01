@@ -8,7 +8,9 @@ require("dotenv").config();
 
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
-const department = process.env.DEPARTMENT;
+const fullDepartment = process.env.DEPARTMENT;
+const department = fullDepartment.replaceAll(" ","-").toLowerCase();
+
 const socketUrl = process.env.WEB_SOCKET_URL;
 
 const socket = new WebSocket(`${socketUrl}?category=${department}`);
@@ -91,7 +93,7 @@ async function processQueue() {
       const category = item.properties.find(
         (i) => i.name == "_" + "Department"
       )?.value;
-      if (category.split(" ")[0].toLowerCase() != department) return;
+      if (category.replaceAll(" ","-").toLowerCase() != department) return;
 
       if (!groupedItems[category]) groupedItems[category] = [];
       groupedItems[category].push(item);
