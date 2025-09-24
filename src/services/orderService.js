@@ -39,6 +39,13 @@ ${address.country}
 `.trim();
 }
 
+function ensureDirectoryExists(filePath) {
+  const dir = path.dirname(filePath);
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
+}
+
 async function generatePdfFromHtml(html, outputPath) {
   const browser = await puppeteer.launch({
     headless: true,
@@ -49,6 +56,13 @@ async function generatePdfFromHtml(html, outputPath) {
   await page.setContent(html, {
     waitUntil: "networkidle0",
   });
+
+  outputPath = path.join(
+    path.dirname(outputPath),
+    sanitizeFileName(path.basename(outputPath))
+  );
+  ensureDirectoryExists(outputPath);
+
 
   await page.pdf({
     path: outputPath,
@@ -64,6 +78,10 @@ async function generatePdfFromHtml(html, outputPath) {
 
   await browser.close();
   return outputPath;
+}
+
+function sanitizeFileName(name) {
+  return name.replace(/[<>:"/\\|?*]/g, "_");
 }
 
 async function processQueue() {
@@ -91,7 +109,7 @@ async function processQueue() {
     const groupedItems = {};
     order.lineItem.forEach((item) => {
       const category = item.properties.find(i => i.name == "_"+"Department")?.value;
-      if(category.split(" ")[0].toLowerCase() != department) return;
+      if(category.replaceAll(" ", "-").toLowerCase() != department.replaceAll(" ", "-").toLowerCase()) return;
 
       if (!groupedItems[category]) groupedItems[category] = [];
       groupedItems[category].push(item);
@@ -173,7 +191,6 @@ async function processQueue() {
         formatCurrency: formatCurrency,
       };
       const renderedHtml = ejs.render(template, templateData);
-
       await generatePdfFromHtml(renderedHtml, pdfPath);
 
       const orderPdf = await prisma.orderPdf.create({
